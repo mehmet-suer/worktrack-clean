@@ -1,15 +1,16 @@
 spring:
-  config:
-    import: optional:file:/etc/config/secrets.yml
   datasource:
-    url: jdbc:mysql://localhost:3306/worktrack_db
+    url: jdbc:mysql://127.0.0.1:3306/worktrack_clean
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${db.username}
-    password: ${db.password}
+    hikari:
+      connection-test-query: SELECT 1
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: false
-jwt:
-  secret: ${jwt.secret}
-  expiration: 86400000
+
+user:
+  service:
+    base-url: http://worktrack-layered-service.worktrack-layered.svc.cluster.local:8000

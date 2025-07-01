@@ -2,7 +2,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:h2:file:./data/worktrack-test-db;AUTO_SERVER=TRUE
+    url: jdbc:h2:file:./data/worktrack-clean-test-db;AUTO_SERVER=TRUE
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -20,6 +20,3 @@ spring:
         enable_lazy_load_no_trans: true
     auditing:
       enabled: true
-
-file:
-  upload-dir: /Users/mehmetsuer/Desktop/SpringCourse/worktrack/testuploads

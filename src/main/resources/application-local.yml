@@ -1,0 +1,19 @@
+spring:
+  config:
+    import: optional:file:/etc/config/secrets.yml
+  datasource:
+    url: jdbc:mysql://localhost:3306/worktrack_db_clean
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${db.username}
+    password: ${db.password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+jwt:
+  secret: ${jwt.secret}
+  expiration: 86400000
+
+user:
+  service:
+    base-url: http://localhost:8000

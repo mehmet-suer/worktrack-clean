@@ -4,12 +4,12 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-
+logs/
 ### STS ###
 .apt_generated
 .classpath
 .factorypath
-.project
+.projectJpaEntity
 .settings
 .springBeans
 .sts4-cache
@@ -35,3 +35,4 @@ out/
 
 ### VS Code ###
 .vscode/
+/data/

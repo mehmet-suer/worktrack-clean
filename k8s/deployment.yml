@@ -1,63 +1,120 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spring-app
-  namespace: test
+  name: worktrack-clean
+  namespace: worktrack-clean
   labels:
-    app: spring-app
+    app: worktrack-clean
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: spring-app
+      app: worktrack-clean
   template:
     metadata:
       labels:
-        app: spring-app
+        app: worktrack-clean
     spec:
       containers:
-        - name: spring-app
-          image: spring-app
-          imagePullPolicy: Never
+        - name: worktrack-clean
+          image: gcr.io/operating-edge-464110-v6/worktrack-clean:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 8000
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: "int"
-            - name: JWT_SECRET
+              value: int
+            - name: DB_HOST
+              value: 127.0.0.1
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: jwt-test-secret
-                  key: JWT_SECRET
-            - name: MYSQL_USER
+                  name: worktrack-clean-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql-test-secret
-                  key: MYSQL_USER
-            - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-test-secret
-                  key: MYSQL_PASSWORD
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-test-secret
-                  key: MYSQL_ROOT_PASSWORD
+                  name: worktrack-clean-secret
+                  key: DB_PASSWORD
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 4
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 4
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000  # Non-root user
+            allowPrivilegeEscalation: false
+        - name: cloud-sql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.33.4
+          command:
+            - "/cloud_sql_proxy"
+            - "-instances=operating-edge-464110-v6:us-central1:worktrack-clean=tcp:3306"
+            - "-credential_file=/secrets/service_account.json"
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets
+              readOnly: true
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-sa-secret
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: spring-app-service
-  namespace: test
+  name: worktrack-clean-service
+  namespace: worktrack-clean
   labels:
-    app: spring-app
+    app: worktrack-clean
 spec:
   selector:
-    app: spring-app
+    app: worktrack-clean
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 8080
+      port: 8000
+      targetPort: 8000
       nodePort: 30080
   type: NodePort
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: worktrack-clean-hpa
+  namespace: worktrack-clean
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: worktrack-clean
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60

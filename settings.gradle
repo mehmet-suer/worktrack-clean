@@ -1,3 +1,2 @@
-rootProject.name = 'worktrack'
-include 'integration-test'
+rootProject.name = 'worktrack-v2-clean-hexagonal'
 

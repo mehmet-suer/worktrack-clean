@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:file:./data/worktrack-db;AUTO_SERVER=TRUE
+    url: jdbc:h2:file:./data/worktrack-db-clean;AUTO_SERVER=TRUE
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -13,9 +13,10 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-file:
-  upload-dir: /Users/mehmetsuer/Desktop/SpringCourse/worktrack/uploads
+  devtools:
+    restart:
+      enabled=true:
 
-jwt:
-   secret: UiZEKSMjY3MjOTRJVl5kRmJyODRqeDVOeHN2c2c0UGY=
-   expiration: 86400000
+user:
+  service:
+    base-url: http://localhost:8000

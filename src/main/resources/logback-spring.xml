@@ -1,37 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
-    <!-- logs klasörü içinde loglar tutulacak -->
-    <property name="LOG_PATH" value="logs"/>
-
-    <!-- Logstash uyumlu JSON log formatı için encoder -->
-    <appender name="APP_JSON" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/application.json</file>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/application.%d{yyyy-MM-dd}.json</fileNamePattern>
-            <maxHistory>7</maxHistory>
-        </rollingPolicy>
     </appender>
 
-    <!-- HTTP request logları için ayrı dosya -->
-    <appender name="REQUEST_JSON" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/request.json</file>
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/request.%d{yyyy-MM-dd}.json</fileNamePattern>
-            <maxHistory>7</maxHistory>
-        </rollingPolicy>
-    </appender>
-
-
-    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="INFO" additivity="false">
-        <appender-ref ref="REQUEST_JSON"/>
-    </logger>
-
-    <!-- Genel loglar -->
     <root level="INFO">
-        <appender-ref ref="APP_JSON"/>
+        <appender-ref ref="STDOUT"/>
     </root>
-
 </configuration>
