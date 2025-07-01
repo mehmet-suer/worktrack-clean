@@ -16,7 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("clean/api/v1/projects")
 public class ProjectController {
 
     private final CreateProjectService createProjectService;

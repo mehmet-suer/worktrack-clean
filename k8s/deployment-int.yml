@@ -19,7 +19,7 @@ spec:
         - name: worktrack-clean
           image: gcr.io/operating-edge-464110-v6/worktrack-clean:latest
           ports:
-            - containerPort: 8000
+            - containerPort: 8001
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: int
@@ -47,14 +47,14 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: 8000
+              port: 8001
             initialDelaySeconds: 30
             periodSeconds: 15
             failureThreshold: 4
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: 8000
+              port: 8001
             initialDelaySeconds: 15
             periodSeconds: 10
             failureThreshold: 4
@@ -66,7 +66,7 @@ spec:
           image: gcr.io/cloudsql-docker/gce-proxy:1.33.4
           command:
             - "/cloud_sql_proxy"
-            - "-instances=operating-edge-464110-v6:us-central1:worktrack-clean=tcp:3306"
+            - "-instances=operating-edge-464110-v6:us-central1:worktrack-layered=tcp:3306"
             - "-credential_file=/secrets/service_account.json"
           volumeMounts:
             - name: cloudsql-instance-credentials
@@ -93,9 +93,9 @@ spec:
     app: worktrack-clean
   ports:
     - protocol: TCP
-      port: 8000
-      targetPort: 8000
-      nodePort: 30080
+      port: 8001
+      targetPort: 8001
+      nodePort: 30081
   type: NodePort
 
 ---

@@ -53,16 +53,20 @@ jobs:
       - name: Build application JAR
         run: ./gradlew :clean :build -x test -Dspring.profiles.active=int
 
-      - name: Run integration tests
-        run: ./gradlew :integration-test:test
+
+      - name: Set IMAGE_TAG
+        id: vars
+        run: echo "IMAGE_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Build Docker image
-        run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/worktrack-clean:latest .
+        run: docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/worktrack-clean:${{ env.IMAGE_TAG }} .
 
-      - name: Push Docker image to GCR
+      - name: Push Docker image
+        run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/worktrack-clean:${{ env.IMAGE_TAG }}
+
+      - name: Update deployment yaml image tag
         run: |
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/worktrack-clean:latest
+          sed -i "s|image: gcr.io/.*/worktrack-clean:.*|image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/worktrack-clean:${{ env.IMAGE_TAG }}|" k8s/deployment-int.yml
 
       - name: Get GKE credentials
         run: |

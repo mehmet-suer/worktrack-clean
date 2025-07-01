@@ -19,9 +19,7 @@ import java.util.concurrent.TimeUnit;
 @EnableConfigurationProperties(UserServiceClientProperties.class)
 public class UserServiceClientConfig {
 
-    private static final String BASE_URL = "http://localhost:8000";
-
-    @Bean(name = "userServiceClient")
+    @Bean(name = "userServiceClientBean")
     public WebClient webClient(WebClient.Builder builder,
                                UserServiceClientProperties properties) {
 
@@ -37,7 +35,7 @@ public class UserServiceClientConfig {
                         .addHandlerLast(new WriteTimeoutHandler(5, TimeUnit.SECONDS)));
 
         return builder
-                .baseUrl(BASE_URL)
+                .baseUrl(properties.getBaseUrl())
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .build();
     }

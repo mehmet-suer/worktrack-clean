@@ -20,7 +20,7 @@ public class UserServiceClient implements UserServicePort {
 
     private final WebClient webClient;
 
-    public UserServiceClient(@Qualifier("userServiceClient") WebClient webClient) {
+    public UserServiceClient(@Qualifier("userServiceClientBean") WebClient webClient) {
         this.webClient = webClient;
     }
 
@@ -28,7 +28,7 @@ public class UserServiceClient implements UserServicePort {
     public Optional<User> getUserById(UserId userId) {
         try {
             UserDto user = webClient.get()
-                    .uri("/api/users/{id}", userId.value())
+                    .uri("layered/api/v1/users/{id}", userId.value())
                     .retrieve()
                     .onStatus(
                             HttpStatusCode::is4xxClientError,
@@ -53,7 +53,7 @@ public class UserServiceClient implements UserServicePort {
     @Override
     public Optional<User> getAuthenticatedUserInfo(String token) {
         UserDto userInfo = webClient.get()
-                .uri("http://localhost:8000/api/auth/me")
+                .uri("layered/api/v1/auth/me")
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
                 .onStatus(
@@ -68,7 +68,6 @@ public class UserServiceClient implements UserServicePort {
                 )
                 .bodyToMono(UserDto.class)
                 .block();
-        System.out.println("User Info: " + userInfo);
         return Optional.ofNullable(userInfo).map(UserMapper::toDomain);
 
     }

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping("clean/api/v1/tasks")
 public class TaskController {
 
     private final CreateTaskUseCase createTaskUseCase;
@@ -40,7 +40,6 @@ public class TaskController {
     }
 
 
-    // 1. Task Oluşturma
     @PostMapping
     public ResponseEntity<TaskResponse> createTask(
             @PathVariable Long projectId,
@@ -51,7 +50,6 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // 2. Task Atama (assign)
     @PatchMapping("/{taskId}/assign")
     public ResponseEntity<TaskResponse> assignTask(
             @PathVariable Long projectId,
@@ -61,7 +59,6 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
-    // 3. Task Listesi Getirme
     @GetMapping
     public ResponseEntity<List<TaskResponse>> getTasks(@PathVariable Long projectId) {
         List<Task> tasks = taskQueryService.getByProject(new ProjectId(projectId));
@@ -71,7 +68,6 @@ public class TaskController {
         return ResponseEntity.ok(responses);
     }
 
-    // 4. Task Silme
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
         deleteTaskUseCase.delete(new TaskId(taskId));
